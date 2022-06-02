@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import dns.resolver, dns.dnssec, time, requests, json
 
 GREEN = '\033[32m'
