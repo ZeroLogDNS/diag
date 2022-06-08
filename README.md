@@ -2,7 +2,7 @@
 
 A simple python3 script that can diagnose various errors with the service.
 
-![Screenshot](https://raw.githubusercontent.com/ZeroLogDNS/diag/main/image.png)
+![Screenshot](https://github.com/ZeroLogDNS/diag/blob/main/run.gif?raw=true)
 
 ## Run the script
 
