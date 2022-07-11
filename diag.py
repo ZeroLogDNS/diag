@@ -1,6 +1,5 @@
-#!/usr/bin/python
-
-import dns.resolver, dns.dnssec, time, requests, json
+import time, requests, json
+import dnslocal
 
 GREEN = '\033[32m'
 YELLOW = '\033[33m'
@@ -20,36 +19,18 @@ def print_text(text, color):
 def info(text):
     print(GREEN + "[I] " + END + text, END)
 
-def process_request(domain, dnstype):
-    try:
-        query = dns.resolver.resolve(domain, dnstype)
-        for value in query:
-            return value.to_text().replace('"', '' , 2)
-    
-    except dns.resolver.NXDOMAIN:
-        return 100
-
-    except dns.resolver.Timeout:
-        return 101
-
-    except dns.resolver.NoAnswer:
-        return 102
-
-    except dns.resolver.NoNameservers:
-        return 103
-
 def service_test():
-    if process_request("test.zerologdns.net", "TXT") == "Ok":
+    if dnslocal.process_request("t.zerologdns.net", "TXT") == "yes":
         print_text("The service is available", GREEN)
-    elif process_request("test.zerologdns.net", "TXT") == 103:
+    elif dnslocal.process_request("t.zerologdns.net", "TXT") == 103:
         print_text("Server-side error [SERVERFAIL]", RED)
         print_text("If you have time, please report the problem to us", YELLOW)
         exit()
-    elif process_request("test.zerologdns.net", "TXT") == 101:
+    elif dnslocal.process_request("t.zerologdns.net", "TXT") == 101:
         print_text("The service is unavailable. [Timeout]", RED)
         print_text("If you have time, please report the problem to us", YELLOW)
         exit()
-    elif process_request("test.zerologdns.net", "TXT") == "No":
+    elif dnslocal.process_request("t.zerologdns.net", "TXT") == "no":
         print_text("This script only works if you are using ZeroLogDNS", YELLOW)
         exit()
     else:
@@ -57,23 +38,26 @@ def service_test():
         exit()
 
 def which_version():
-    if process_request("test.zerologdns.net", "TXT") == "Ok" and process_request("adtest.zerologdns.net", "A") != "37.221.197.124":
+    if dnslocal.process_request("t.zerologdns.net", "TXT") == "yes" and dnslocal.process_request("blocked.zerologdns.net", "TXT") == "no":
         print_text("You are using the uncensored version of ZeroLogDNS", GREEN)
-    elif process_request("test.zerologdns.net", "TXT") == "Ok" and process_request("adtest.zerologdns.net", "A") == "37.221.197.124":
+    elif dnslocal.process_request("t.zerologdns.net", "TXT") == "yes" and dnslocal.process_request("blocked.zerologdns.net", "TXT") == 100 :
         print_text("You are using the censored version of ZeroLogDNS", GREEN)
         time.sleep(1)
         censored_test()
+    else:
+        print_text("Unknown error", RED)
+
 
 def censored_test():
-    if process_request("blocked.zerologdns.net", "TXT") == 100:
+    if dnslocal.process_request("blocked.zerologdns.net", "TXT") == 100 and dnslocal.process_request("blocked.getdns.in", "TXT") == 100:
         print_text("The filter is working.", GREEN)
-    elif process_request("blocked.zerologdns.net", "TXT") == "No":
-        print_text("The filtered domain is resolving. There is probably a DNS-Leak. Test it here: https://dnscheck.tools/#advanced", YELLOW)
+    elif dnslocal.process_request("blocked.zerologdns.net", "TXT") == "no" and dnslocal.process_request("blocked.getdns.in", "TXT" == "no") :
+        print_text("The filtered domains are resolving. There is probably a DNS-Leak. Test it here: https://dnscheck.tools", YELLOW)
     else:
         print_text("Unknown error", RED)
 
 def dnssec_test():
-    if process_request("servfail.sidnlabs.nl", "A") == 103:
+    if dnslocal.process_request("servfail.sidnlabs.nl", "A") == 103:
         print_text("DNSSEC is working", GREEN)
     else:
         print_text("DNSSEC is not working", RED)
