@@ -38,21 +38,11 @@ def service_test():
         exit()
 
 def which_version():
-    if dnslocal.process_request("t.zerologdns.net", "TXT") == "yes" and dnslocal.process_request("blocked.zerologdns.net", "TXT") == "no":
+    if dnslocal.process_request("t.zerologdns.net", "TXT") == "yes" and dnslocal.process_request("ad-test.zerologdns.net", "TXT") == "ok":
         print_text("You are using the uncensored version of ZeroLogDNS", GREEN)
-    elif dnslocal.process_request("t.zerologdns.net", "TXT") == "yes" and dnslocal.process_request("blocked.zerologdns.net", "TXT") == 100 :
+    elif dnslocal.process_request("t.zerologdns.net", "TXT") == "yes" and dnslocal.process_request("ad-test.zerologdns.net", "TXT") == 100 :
         print_text("You are using the censored version of ZeroLogDNS", GREEN)
         time.sleep(1)
-        censored_test()
-    else:
-        print_text("Unknown error", RED)
-
-
-def censored_test():
-    if dnslocal.process_request("blocked.zerologdns.net", "TXT") == 100 and dnslocal.process_request("blocked.getdns.in", "TXT") == 100:
-        print_text("The filter is working.", GREEN)
-    elif dnslocal.process_request("blocked.zerologdns.net", "TXT") == "no" and dnslocal.process_request("blocked.getdns.in", "TXT" == "no") :
-        print_text("The filtered domains are resolving. There is probably a DNS-Leak. Test it here: https://dnscheck.tools", YELLOW)
     else:
         print_text("Unknown error", RED)
 
@@ -61,17 +51,6 @@ def dnssec_test():
         print_text("DNSSEC is working", GREEN)
     else:
         print_text("DNSSEC is not working", RED)
-
-def get_status():
-    if (requests.get('https://api.deta.zerologdns.net/dns/1').json()["DNS"] == "ok") and (requests.get('https://api.deta.zerologdns.net/dns/2').json()["DNS"] == "ok"):
-        print_text("All servers are available!", GREEN)
-    elif (requests.get('https://api.deta.zerologdns.net/dns/1').json()["DNS"] != "ok") or (requests.get('https://api.deta.zerologdns.net/dns/2').json()["DNS"] != "ok"):
-        print_text("Only 1 server is available!", YELLOW)
-    elif (requests.get('https://api.deta.zerologdns.net/dns/1').json()["DNS"] != "ok") and (requests.get('https://api.deta.zerologdns.net/dns/2').json()["DNS"] != "ok"):
-         print_text("No server is available!", RED)
-    else:
-        print_text("Unknown error", RED)
-
 
 
 def test():
@@ -82,9 +61,7 @@ def test():
     time.sleep(1)
     dnssec_test()
     time.sleep(1)
-    get_status()
-    time.sleep(1)
     print_text("Done", GREEN)
 
-
-test()
+if __name__ == "__main__":
+    test()
